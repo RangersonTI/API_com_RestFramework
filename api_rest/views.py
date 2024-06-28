@@ -69,7 +69,7 @@ def user_manager(request):
 
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 #CREATE
 
@@ -82,30 +82,33 @@ def user_manager(request):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
 
         return Response(status.HTTP_400_BAD_REQUEST)
-    
+
 
 # UPDATE
 
     if request.method == 'PUT':
-        
+
         user_nickname = request.data['user_nickname']
-        
+
         try:
             user_update = User.objects.get(pk = user_nickname)
         except:
-            return Response(status = status.HTTP_202_ACCEPTED)
-        
+            print(f"\n\nUsuario NÃO EXISTE\n\n")
+            return Response(status = status.HTTP_400_BAD_REQUEST)
+
         serializers = UserSerializer(user_update, data = request.data)
-        
+
         if serializers.is_valid():
             serializers.save()
-            return Response(status = status.HTTP_400_BAD_REQUEST)
+            return Response(status = status.HTTP_202_ACCEPTED)
+        return Response(serializers.errors ,status = status.HTTP_400_BAD_REQUEST)
 
 # DELETE
 
-    if request.method == 'DELETE':
+    if request.method == 'DELETE': 
         try:
-            user_nickname = request.data['user_nickname']
+            user_nickname = request.GET['user']
+            print(f"\n\nUsuario: {user_nickname}\n\n")
             delete_user = User.objects.get(pk=user_nickname)
             delete_user.delete()
             return Response(status= status.HTTP_202_ACCEPTED)
